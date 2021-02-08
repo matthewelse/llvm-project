@@ -703,6 +703,21 @@ def CC_X86_64_OCAML : CallingConv<[
             CCAssignToReg<[XMM0, XMM1, XMM2, XMM3, XMM4, XMM5, XMM6, XMM7, XMM8, XMM9]>>>,
 ]>;
 
+def CC_X86_64_OCAML_CCALL : CallingConv<[
+  // Promote i8/i16/i32 arguments to i64.
+  CCIfType<[i8, i16, i32], CCPromoteToType<i64>>,
+
+  // When we call caml_c_call, we need to pass the function in RAX (OCaml-style
+  // argument passing), and the remaining arguments C-style. This is kind of
+  // annoying, but oh well.
+
+  CCIfType<[i64], CCAssignToReg<[RAX,RDI,RSI,RDX,RCX,R8,R9]>>,
+
+  CCIfType<[f32, f64, v16i8, v8i16, v4i32, v2i64, v4f32, v2f64],
+            CCIfSubtarget<"hasSSE1()",
+            CCAssignToReg<[XMM0, XMM1, XMM2, XMM3, XMM4, XMM5, XMM6, XMM7, XMM8, XMM9]>>>,
+]>;
+
 def CC_X86_64_HiPE : CallingConv<[
   // Promote i8/i16/i32 arguments to i64.
   CCIfType<[i8, i16, i32], CCPromoteToType<i64>>,
@@ -1057,6 +1072,7 @@ def CC_X86_64 : CallingConv<[
   CCIfCC<"CallingConv::X86_RegCall", CCDelegateTo<CC_X86_SysV64_RegCall>>,
   CCIfCC<"CallingConv::X86_INTR", CCCustom<"CC_X86_Intr">>,
   CCIfCC<"CallingConv::OCaml", CCDelegateTo<CC_X86_64_OCAML>>,
+  CCIfCC<"CallingConv::OCaml_CCall", CCDelegateTo<CC_X86_64_OCAML_CCALL>>,
 
   // Mingw64 and native Win64 use Win64 CC
   CCIfSubtarget<"isTargetWin64()", CCDelegateTo<CC_X86_Win64_C>>,

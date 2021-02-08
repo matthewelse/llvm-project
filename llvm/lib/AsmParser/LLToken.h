@@ -172,6 +172,7 @@ enum Kind {
   kw_amdgpu_kernel,
   kw_tailcc,
   kw_ocamlcc,
+  kw_ocaml_ccallcc,
 
   // Attributes:
   kw_attributes,

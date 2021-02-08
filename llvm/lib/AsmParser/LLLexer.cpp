@@ -626,6 +626,7 @@ lltok::Kind LLLexer::LexIdentifier() {
   KEYWORD(amdgpu_kernel);
   KEYWORD(tailcc);
   KEYWORD(ocamlcc);
+  KEYWORD(ocaml_ccallcc);
 
   KEYWORD(cc);
   KEYWORD(c);

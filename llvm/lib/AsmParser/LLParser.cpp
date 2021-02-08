@@ -2011,6 +2011,7 @@ bool LLParser::ParseOptionalCallingConv(unsigned &CC) {
   case lltok::kw_amdgpu_kernel:  CC = CallingConv::AMDGPU_KERNEL; break;
   case lltok::kw_tailcc:         CC = CallingConv::Tail; break;
   case lltok::kw_ocamlcc:        CC = CallingConv::OCaml; break;
+  case lltok::kw_ocaml_ccallcc:  CC = CallingConv::OCaml_CCall; break;
   case lltok::kw_cc: {
       Lex.Lex();
       return ParseUInt32(CC);
