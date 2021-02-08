@@ -3184,7 +3184,7 @@ static bool canGuaranteeTCO(CallingConv::ID CC) {
   return (CC == CallingConv::Fast || CC == CallingConv::GHC ||
           CC == CallingConv::X86_RegCall || CC == CallingConv::HiPE ||
           CC == CallingConv::HHVM || CC == CallingConv::Tail ||
-          CC == CallingConv::Oaml);
+          CC == CallingConv::OCaml);
 }
 
 /// Return true if we might ever do TCO for calls with this calling convention.
