@@ -1051,6 +1051,7 @@ def CC_X86_64 : CallingConv<[
     CCIfSubtarget<"isTargetWin64()", CCDelegateTo<CC_X86_Win64_RegCall>>>,
   CCIfCC<"CallingConv::X86_RegCall", CCDelegateTo<CC_X86_SysV64_RegCall>>,
   CCIfCC<"CallingConv::X86_INTR", CCCustom<"CC_X86_Intr">>,
+  CCIfCC<"CallingConv::OCaml", CCDelegateTo<CC_X86_64_OCAML>>,
 
   // Mingw64 and native Win64 use Win64 CC
   CCIfSubtarget<"isTargetWin64()", CCDelegateTo<CC_X86_Win64_C>>,
@@ -1174,7 +1175,7 @@ def CSR_SysV64_RegCall_NoSSE : CalleeSavedRegs<(add RBX, RBP,
 def CSR_SysV64_RegCall       : CalleeSavedRegs<(add CSR_SysV64_RegCall_NoSSE,               
                                                (sequence "XMM%u", 8, 15))>;
 
-def CC_X86_64_OCAMLOPT : CallingConv<[
+def CC_X86_64_OCAML : CallingConv<[
   // Promote i8/i16/i32 arguments to i64.
   CCIfType<[i8, i16, i32], CCPromoteToType<i64>>,
 
