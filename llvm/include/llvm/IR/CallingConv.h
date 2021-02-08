@@ -241,6 +241,10 @@ namespace CallingConv {
     /// The remainder matches the regular calling convention.
     WASM_EmscriptenInvoke = 99,
 
+    /// Calling convention used for the OCaml optimising compiler. Passes as
+    /// many arguments as possible in registers.
+    OCaml = 100,
+
     /// The highest possible calling convention ID. Must be some 2^k - 1.
     MaxID = 1023
   };
