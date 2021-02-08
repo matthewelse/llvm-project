@@ -244,6 +244,10 @@ namespace CallingConv {
     /// Calling convention used for AMD graphics targets.
     AMDGPU_Gfx = 100,
 
+    /// Calling convention used for the OCaml optimising compiler. Passes as
+    /// many arguments as possible in registers.
+    OCaml = 101,
+
     /// The highest possible calling convention ID. Must be some 2^k - 1.
     MaxID = 1023
   };
