@@ -1173,3 +1173,17 @@ def CSR_SysV64_RegCall_NoSSE : CalleeSavedRegs<(add RBX, RBP,
                                                (sequence "R%u", 12, 15))>;
 def CSR_SysV64_RegCall       : CalleeSavedRegs<(add CSR_SysV64_RegCall_NoSSE,               
                                                (sequence "XMM%u", 8, 15))>;
+
+def CC_X86_64_OCAMLOPT : CallingConv<[
+  // Promote i8/i16/i32 arguments to i64.
+  CCIfType<[i8, i16, i32], CCPromoteToType<i64>>,
+
+  // Pass in STG registers: Base, Sp, Hp, R1, R2, R3, R4, R5, R6, SpLim
+  CCIfType<[i64],
+            CCAssignToReg<[RAX,RBX,RDI,RSI,RDX,RCX,R8,R9,R12,R13]>>,
+
+  // Pass in STG registers: F1, F2, F3, F4, D1, D2
+  CCIfType<[f32, f64, v16i8, v8i16, v4i32, v2i64, v4f32, v2f64],
+            CCIfSubtarget<"hasSSE1()",
+            CCAssignToReg<[XMM0, XMM1, XMM2, XMM3, XMM4, XMM5, XMM6, XMM7, XMM8, XMM9]>>>,
+]>;
