@@ -247,6 +247,7 @@ namespace CallingConv {
     /// Calling convention used for the OCaml optimising compiler. Passes as
     /// many arguments as possible in registers.
     OCaml = 101,
+    OCaml_CCall = 102,
 
     /// The highest possible calling convention ID. Must be some 2^k - 1.
     MaxID = 1023
