@@ -570,6 +570,19 @@ BitVector X86RegisterInfo::getReservedRegs(const MachineFunction &MF) const {
   for (unsigned n = 0; n != 8; ++n)
     Reserved.set(X86::ST0 + n);
 
+  // OCaml-specific changes: r14 and r15 are reserved.
+  bool IsOcaml = true;
+
+  if (IsOcaml) {
+    for (MCRegAliasIterator AI(X86::R14, this, true); AI.isValid(); ++AI) {
+      Reserved.set(*AI);
+    }
+
+    for (MCRegAliasIterator AI(X86::R15, this, true); AI.isValid(); ++AI) {
+      Reserved.set(*AI);
+    }
+  }
+
   // Reserve the registers that only exist in 64-bit mode.
   if (!Is64Bit) {
     // These 8-bit registers are part of the x86-64 extension even though their
