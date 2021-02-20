@@ -44,7 +44,7 @@ public:
 } // end anonymous namespace
 
 static GCMetadataPrinterRegistry::Add<OcamlGCMetadataPrinter>
-    Y("ocaml", "ocaml 3.10-compatible collector");
+    Y("ocaml", "ocaml 4.11-compatible collector");
 
 void llvm::linkOcamlGCPrinter() {}
 
@@ -54,6 +54,8 @@ static void EmitCamlGlobal(const Module &M, AsmPrinter &AP, const char *Id) {
   std::string SymName;
   SymName += "caml";
   size_t Letter = SymName.size();
+
+  // TODO melse: replace module id with some metadata to avoid naming pain
   SymName.append(MId.begin(), llvm::find(MId, '.'));
   SymName += "__";
   SymName += Id;
@@ -72,11 +74,11 @@ static void EmitCamlGlobal(const Module &M, AsmPrinter &AP, const char *Id) {
 
 void OcamlGCMetadataPrinter::beginAssembly(Module &M, GCModuleInfo &Info,
                                            AsmPrinter &AP) {
-  AP.OutStreamer->SwitchSection(AP.getObjFileLowering().getTextSection());
-  EmitCamlGlobal(M, AP, "code_begin");
-
   AP.OutStreamer->SwitchSection(AP.getObjFileLowering().getDataSection());
   EmitCamlGlobal(M, AP, "data_begin");
+
+  AP.OutStreamer->SwitchSection(AP.getObjFileLowering().getTextSection());
+  EmitCamlGlobal(M, AP, "code_begin");
 }
 
 /// emitAssembly - Print the frametable. The ocaml frametable format is thus:
@@ -124,11 +126,7 @@ void OcamlGCMetadataPrinter::finishAssembly(Module &M, GCModuleInfo &Info,
     }
   }
 
-  if (NumDescriptors >= 1 << 16) {
-    // Very rude!
-    report_fatal_error(" Too much descriptor for ocaml GC");
-  }
-  AP.emitInt16(NumDescriptors);
+  AP.emitInt64(NumDescriptors);
   AP.emitAlignment(IntPtrSize == 4 ? Align(4) : Align(8));
 
   for (GCModuleInfo::FuncInfoVec::iterator I = Info.funcinfo_begin(),
@@ -139,7 +137,8 @@ void OcamlGCMetadataPrinter::finishAssembly(Module &M, GCModuleInfo &Info,
       // this function is managed by some other GC
       continue;
 
-    uint64_t FrameSize = FI.getFrameSize();
+    uint64_t FrameSize = FI.getFrameSize() + 8 /* include the return address */;
+
     if (FrameSize >= 1 << 16) {
       // Very rude!
       report_fatal_error("Function '" + FI.getFunction().getName() +
@@ -149,6 +148,13 @@ void OcamlGCMetadataPrinter::finishAssembly(Module &M, GCModuleInfo &Info,
                          ">= 65536.\n"
                          "(" +
                          Twine(reinterpret_cast<uintptr_t>(&FI)) + ")");
+    } else if ((FrameSize & 0x3) != 0) {
+      // this would imply that there is debug or alloc information after this
+      report_fatal_error(
+          "FrameSize & 0x3 is non-zero. FrameSize: " + Twine(FrameSize) +
+          "\n"
+          "(" +
+          Twine(reinterpret_cast<uintptr_t>(&FI)) + ")");
     }
 
     AP.OutStreamer->AddComment("live roots for " +
@@ -177,6 +183,9 @@ void OcamlGCMetadataPrinter::finishAssembly(Module &M, GCModuleInfo &Info,
           report_fatal_error(
               "GC root stack offset is outside of fixed stack frame and out "
               "of range for ocaml GC!");
+        } else if ((K->StackOffset & 1) != 0) {
+          report_fatal_error("GC root is misaligned. This makes it look like "
+                             "it lives in a register.");
         }
         AP.emitInt16(K->StackOffset);
       }
