@@ -49,14 +49,22 @@ static GCMetadataPrinterRegistry::Add<OcamlGCMetadataPrinter>
 void llvm::linkOcamlGCPrinter() {}
 
 static void EmitCamlGlobal(const Module &M, AsmPrinter &AP, const char *Id) {
-  const std::string &MId = M.getModuleIdentifier();
+  StringRef ModuleName;
+
+  if (NamedMDNode* N = M.getNamedMetadata("ocaml.module_name")) {
+    MDNode &O = *(N->getOperand(0));
+    Metadata *node = O.getOperand(0);
+
+    ModuleName = cast<MDString>(node)->getString();
+  } else {
+    report_fatal_error("no metadata :(");
+  }
 
   std::string SymName;
   SymName += "caml";
   size_t Letter = SymName.size();
 
-  // TODO melse: replace module id with some metadata to avoid naming pain
-  SymName.append(MId.begin(), llvm::find(MId, '.'));
+  SymName.append(ModuleName.begin(), ModuleName.end());
   SymName += "__";
   SymName += Id;
 
