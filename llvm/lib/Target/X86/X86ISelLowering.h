@@ -305,6 +305,10 @@ namespace llvm {
     // SjLj exception handling dispatch.
     EH_SJLJ_SETUP_DISPATCH,
 
+    OCAML_SETJMP,
+    OCAML_POPJMP,
+    OCAML_RAISE,
+
     /// Tail call return. See X86TargetLowering::LowerCall for
     /// the list of operands.
     TC_RETURN,

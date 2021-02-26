@@ -228,6 +228,25 @@ let hasSideEffects = 1, isBarrier = 1, isCodeGenOnly = 1,
   }
 }
 
+let hasSideEffects = 1, isBarrier = 1, isCodeGenOnly = 1,
+    usesCustomInserter = 1 in {
+  def OCAML_SETJMP  : I<0, Pseudo, (outs GR64:$dst), (ins),
+                            "#OCAML_SETJMP",
+                            [(set GR64:$dst, (X86ocaml_setjmp))]>,
+                          Requires<[In64BitMode]>;
+  def OCAML_POPJMP : I<0, Pseudo, (outs), (ins),
+                            "#OCAML_POPJMP",
+                            [(X86ocaml_popjmp)]>,
+                          Requires<[In64BitMode]>;
+
+  let isTerminator = 1 in {
+  def OCAML_RAISE : I<0, Pseudo, (outs), (ins i64mem:$buf),
+                            "#OCAML_RAISE",
+                            [(X86ocaml_raise addr:$buf)]>,
+                          Requires<[In64BitMode]>;
+  }
+}
+
 let isBranch = 1, isTerminator = 1, isCodeGenOnly = 1 in {
   def EH_SjLj_Setup : I<0, Pseudo, (outs), (ins brtarget:$dst),
                         "#EH_SjLj_Setup\t$dst", []>;

@@ -243,6 +243,20 @@ def X86eh_sjlj_setup_dispatch : SDNode<"X86ISD::EH_SJLJ_SETUP_DISPATCH",
                                        SDTypeProfile<0, 0, []>,
                                        [SDNPHasChain, SDNPSideEffect]>;
 
+def X86ocaml_setjmp : SDNode<"X86ISD::OCAML_SETJMP",
+                              SDTypeProfile<1, 0,
+                              [SDTCisPtrTy<0>]>,
+                              [SDNPHasChain, SDNPSideEffect]>;
+
+def X86ocaml_popjmp : SDNode<"X86ISD::OCAML_POPJMP",
+                              SDTypeProfile<0, 0, []>,
+                              [SDNPHasChain, SDNPSideEffect]>;
+
+
+def X86ocaml_raise : SDNode<"X86ISD::OCAML_POPJMP",
+                            SDTypeProfile<0, 1, [SDTCisPtrTy<0>]>,
+                            [SDNPHasChain, SDNPSideEffect]>;
+
 def X86tcret : SDNode<"X86ISD::TC_RETURN", SDT_X86TCRET,
                         [SDNPHasChain,  SDNPOptInGlue, SDNPVariadic]>;
 
