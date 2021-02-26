@@ -462,6 +462,10 @@ X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
   if (TM.Options.ExceptionModel == ExceptionHandling::SjLj)
     setLibcallName(RTLIB::UNWIND_RESUME, "_Unwind_SjLj_Resume");
 
+  setOperationAction(ISD::OCAML_SETJMP, MVT::i64, Custom);
+  setOperationAction(ISD::OCAML_POPJMP, MVT::Other, Custom);
+  setOperationAction(ISD::OCAML_RAISE, MVT::Other, Custom);
+
   // Darwin ABI issue.
   for (auto VT : { MVT::i32, MVT::i64 }) {
     if (VT == MVT::i64 && !Subtarget.is64Bit())

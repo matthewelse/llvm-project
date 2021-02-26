@@ -143,6 +143,10 @@ enum NodeType {
   /// The target initializes the dispatch table here.
   EH_SJLJ_SETUP_DISPATCH,
 
+  OCAML_SETJMP,
+  OCAML_POPJMP,
+  OCAML_RAISE,
+
   /// TargetConstant* - Like Constant*, but the DAG does not do any folding,
   /// simplification, or lowering of the constant. They are used for constants
   /// which are known to fit in the immediate fields of their users, or for
@@ -1032,7 +1036,8 @@ enum NodeType {
   /// DEBUGTRAP - Trap intended to get the attention of a debugger.
   DEBUGTRAP,
 
-  /// UBSANTRAP - Trap with an immediate describing the kind of sanitizer failure.
+  /// UBSANTRAP - Trap with an immediate describing the kind of sanitizer
+  /// failure.
   UBSANTRAP,
 
   /// PREFETCH - This corresponds to a prefetch intrinsic. The first operand
