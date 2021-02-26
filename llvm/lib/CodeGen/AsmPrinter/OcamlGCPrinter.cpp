@@ -51,7 +51,7 @@ void llvm::linkOcamlGCPrinter() {}
 static void EmitCamlGlobal(const Module &M, AsmPrinter &AP, const char *Id) {
   StringRef ModuleName;
 
-  if (NamedMDNode* N = M.getNamedMetadata("ocaml.module_name")) {
+  if (NamedMDNode *N = M.getNamedMetadata("ocaml.module_name")) {
     MDNode &O = *(N->getOperand(0));
     Metadata *node = O.getOperand(0);
 
@@ -145,7 +145,8 @@ void OcamlGCMetadataPrinter::finishAssembly(Module &M, GCModuleInfo &Info,
       // this function is managed by some other GC
       continue;
 
-    uint64_t FrameSize = FI.getFrameSize() + 8 /* include the return address */;
+    uint64_t FrameOffset = 8; /* include the return address */
+    uint64_t FrameSize = FI.getFrameSize() + FrameOffset;
 
     if (FrameSize >= 1 << 16) {
       // Very rude!
