@@ -962,11 +962,7 @@ def int_eh_sjlj_setjmp          : Intrinsic<[llvm_i32_ty], [llvm_ptr_ty]>;
 def int_eh_sjlj_longjmp         : Intrinsic<[], [llvm_ptr_ty], [IntrNoReturn]>;
 def int_eh_sjlj_setup_dispatch  : Intrinsic<[], []>;
 
-// TODO: This isn't really an X86-specific intrinsic, but we'll write it as one
-// for now.
-// returns twice. once with null (regular code path), once with a pointer to
-// an exception that was thrown
-def int_ocaml_setjmp : Intrinsic<[llvm_ptr_ty], []>;
+def int_ocaml_pushhandler: Intrinsic<[], [llvm_ptr_ty]>;
 def int_ocaml_pophandler : Intrinsic<[], []>;
 def int_ocaml_raise : Intrinsic<[], [llvm_ptr_ty], [IntrNoReturn]>;
 

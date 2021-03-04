@@ -305,9 +305,8 @@ namespace llvm {
     // SjLj exception handling dispatch.
     EH_SJLJ_SETUP_DISPATCH,
 
-    OCAML_SETJMP,
-    OCAML_POPJMP,
-    OCAML_RAISE,
+    EH_OCAML_PUSHHANDLER,
+    EH_OCAML_POPHANDLER,
 
     /// Tail call return. See X86TargetLowering::LowerCall for
     /// the list of operands.
@@ -1523,6 +1522,8 @@ namespace llvm {
     SDValue lowerEH_SJLJ_SETJMP(SDValue Op, SelectionDAG &DAG) const;
     SDValue lowerEH_SJLJ_LONGJMP(SDValue Op, SelectionDAG &DAG) const;
     SDValue lowerEH_SJLJ_SETUP_DISPATCH(SDValue Op, SelectionDAG &DAG) const;
+    SDValue lowerEH_OCAML_PUSHHANDLER(SDValue Op, SelectionDAG &DAG) const;
+    SDValue lowerEH_OCAML_POPHANDLER(SDValue Op, SelectionDAG &DAG) const;
     SDValue LowerINIT_TRAMPOLINE(SDValue Op, SelectionDAG &DAG) const;
     SDValue LowerFLT_ROUNDS_(SDValue Op, SelectionDAG &DAG) const;
     SDValue LowerWin64_i128OP(SDValue Op, SelectionDAG &DAG) const;
@@ -1618,6 +1619,12 @@ namespace llvm {
 
     MachineBasicBlock *EmitLoweredIndirectThunk(MachineInstr &MI,
                                                 MachineBasicBlock *BB) const;
+
+    MachineBasicBlock *emitEHOCamlPushHandler(MachineInstr &MI,
+                                              MachineBasicBlock *MBB) const;
+
+    MachineBasicBlock *emitEHOCamlPopHandler(MachineInstr &MI,
+                                             MachineBasicBlock *MBB) const;
 
     MachineBasicBlock *emitEHSjLjSetJmp(MachineInstr &MI,
                                         MachineBasicBlock *MBB) const;

@@ -482,10 +482,14 @@ bool X86PassConfig::addPreISel() {
   const Triple &TT = TM->getTargetTriple();
   if (TT.isOSWindows() && TT.getArch() == Triple::x86)
     addPass(createX86WinEHStatePass());
+
   return true;
 }
 
 void X86PassConfig::addPreRegAlloc() {
+  // TODO: melse - this probably needs to live earlier in the chain.
+  addPass(createX86OCamlEHPass());
+
   if (getOptLevel() != CodeGenOpt::None) {
     addPass(&LiveRangeShrinkID);
     addPass(createX86FixupSetCC());
@@ -501,9 +505,6 @@ void X86PassConfig::addPreRegAlloc() {
   if (getOptLevel() != CodeGenOpt::None) {
     addPass(createX86PreTileConfigPass());
   }
-
-  // TODO: melse - this probably needs to live earlier in the chain.
-  addPass(createX86OCamlEHPass());
 }
 
 void X86PassConfig::addMachineSSAOptimization() {

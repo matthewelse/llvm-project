@@ -459,6 +459,8 @@ X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
   setOperationAction(ISD::EH_SJLJ_SETJMP, MVT::i32, Custom);
   setOperationAction(ISD::EH_SJLJ_LONGJMP, MVT::Other, Custom);
   setOperationAction(ISD::EH_SJLJ_SETUP_DISPATCH, MVT::Other, Custom);
+  setOperationAction(ISD::EH_OCAML_PUSHHANDLER, MVT::Other, Custom);
+  setOperationAction(ISD::EH_OCAML_POPHANDLER, MVT::Other, Custom);
   if (TM.Options.ExceptionModel == ExceptionHandling::SjLj)
     setLibcallName(RTLIB::UNWIND_RESUME, "_Unwind_SjLj_Resume");
 
@@ -26691,6 +26693,24 @@ SDValue X86TargetLowering::lowerEH_SJLJ_SETJMP(SDValue Op,
                      Op.getOperand(0), Op.getOperand(1));
 }
 
+SDValue X86TargetLowering::lowerEH_OCAML_PUSHHANDLER(SDValue Op,
+                                               SelectionDAG &DAG) const {
+  SDLoc DL(Op);
+  outs() << "lowering ISD EH_OCAML_PUSHHANDLER\n";
+
+  return DAG.getNode(X86ISD::EH_OCAML_PUSHHANDLER, DL, MVT::Other,
+		  Op.getOperand(0), Op.getOperand(1));
+}
+
+SDValue X86TargetLowering::lowerEH_OCAML_POPHANDLER(SDValue Op,
+                                               SelectionDAG &DAG) const {
+  SDLoc DL(Op);
+  outs() << "lowering ISD EH_OCAML_POPHANDLER\n";
+
+  return DAG.getNode(X86ISD::EH_OCAML_POPHANDLER, DL, MVT::Other,
+		  Op.getOperand(0));
+}
+
 SDValue X86TargetLowering::lowerEH_SJLJ_LONGJMP(SDValue Op,
                                                 SelectionDAG &DAG) const {
   SDLoc DL(Op);
@@ -30029,6 +30049,10 @@ SDValue X86TargetLowering::LowerOperation(SDValue Op, SelectionDAG &DAG) const {
   case ISD::EH_RETURN:          return LowerEH_RETURN(Op, DAG);
   case ISD::EH_SJLJ_SETJMP:     return lowerEH_SJLJ_SETJMP(Op, DAG);
   case ISD::EH_SJLJ_LONGJMP:    return lowerEH_SJLJ_LONGJMP(Op, DAG);
+  case ISD::EH_OCAML_PUSHHANDLER:
+    return lowerEH_OCAML_PUSHHANDLER(Op, DAG);
+  case ISD::EH_OCAML_POPHANDLER:
+    return lowerEH_OCAML_POPHANDLER(Op, DAG);
   case ISD::EH_SJLJ_SETUP_DISPATCH:
     return lowerEH_SJLJ_SETUP_DISPATCH(Op, DAG);
   case ISD::INIT_TRAMPOLINE:    return LowerINIT_TRAMPOLINE(Op, DAG);
@@ -31050,11 +31074,10 @@ const char *X86TargetLowering::getTargetNodeName(unsigned Opcode) const {
   NODE_NAME_CASE(TLSCALL)
   NODE_NAME_CASE(EH_SJLJ_SETJMP)
   NODE_NAME_CASE(EH_SJLJ_LONGJMP)
+  NODE_NAME_CASE(EH_OCAML_PUSHHANDLER)
+  NODE_NAME_CASE(EH_OCAML_POPHANDLER)
   NODE_NAME_CASE(EH_SJLJ_SETUP_DISPATCH)
   NODE_NAME_CASE(EH_RETURN)
-  NODE_NAME_CASE(OCAML_SETJMP)
-  NODE_NAME_CASE(OCAML_POPJMP)
-  NODE_NAME_CASE(OCAML_RAISE)
   NODE_NAME_CASE(TC_RETURN)
   NODE_NAME_CASE(FNSTCW16m)
   NODE_NAME_CASE(LCMPXCHG_DAG)
@@ -33087,6 +33110,16 @@ void X86TargetLowering::emitSetJmpShadowStackFix(MachineInstr &MI,
 }
 
 MachineBasicBlock *
+X86TargetLowering::emitEHOCamlPushHandler(MachineInstr &MI, MachineBasicBlock *MBB) const {
+  assert(false && "I don't know what to do!");
+}
+
+MachineBasicBlock *
+X86TargetLowering::emitEHOCamlPopHandler(MachineInstr &MI, MachineBasicBlock *MBB) const {
+  assert(false && "I don't know what to do!");
+}
+
+MachineBasicBlock *
 X86TargetLowering::emitEHSjLjSetJmp(MachineInstr &MI,
                                     MachineBasicBlock *MBB) const {
   const DebugLoc &DL = MI.getDebugLoc();
@@ -33972,6 +34005,12 @@ X86TargetLowering::EmitInstrWithCustomInserter(MachineInstr &MI,
   case X86::EH_SjLj_LongJmp32:
   case X86::EH_SjLj_LongJmp64:
     return emitEHSjLjLongJmp(MI, BB);
+
+  case X86::EH_OCaml_PushHandler:
+    return emitEHOCamlPushHandler(MI, BB);
+
+  case X86::EH_OCaml_PopHandler:
+    return emitEHOCamlPopHandler(MI, BB);
 
   case X86::Int_eh_sjlj_setup_dispatch:
     return EmitSjLjDispatchBlock(MI, BB);

@@ -6022,6 +6022,7 @@ void SelectionDAGBuilder::visitIntrinsicCall(const CallInst &I,
     return;
   }
   case Intrinsic::eh_sjlj_setjmp: {
+    outs() << "lowering intrinsic : setjmp\n";
     SDValue Ops[2];
     Ops[0] = getRoot();
     Ops[1] = getValue(I.getArgOperand(0));
@@ -6039,6 +6040,19 @@ void SelectionDAGBuilder::visitIntrinsicCall(const CallInst &I,
     DAG.setRoot(DAG.getNode(ISD::EH_SJLJ_SETUP_DISPATCH, sdl, MVT::Other,
                             getRoot()));
     return;
+  case Intrinsic::ocaml_pushhandler: {
+    outs() << "lowering intrinsic: ocaml pushhandler\n";
+
+    DAG.setRoot(DAG.getNode(ISD::EH_OCAML_POPHANDLER, sdl, MVT::Other,
+			    getRoot(), getValue(I.getArgOperand(0))));
+    return;
+  }
+  case Intrinsic::ocaml_pophandler: {
+    outs() << "lowering intrinsic: ocaml pophandler\n";
+    DAG.setRoot(DAG.getNode(ISD::EH_OCAML_POPHANDLER, sdl, MVT::Other, getRoot()));
+    return;
+  }
+  // TODO: add an intrinsic for OCaml raise.
   case Intrinsic::masked_gather:
     visitMaskedGather(I);
     return;

@@ -2534,9 +2534,8 @@ bool X86DAGToDAGISel::selectAddr(SDNode *Parent, SDValue N, SDValue &Base,
       Parent->getOpcode() != X86ISD::ENQCMDS && // Fixme
       Parent->getOpcode() != X86ISD::EH_SJLJ_SETJMP && // setjmp
       Parent->getOpcode() != X86ISD::EH_SJLJ_LONGJMP && // longjmp
-      Parent->getOpcode() != X86ISD::OCAML_SETJMP &&
-      Parent->getOpcode() != X86ISD::OCAML_POPJMP &&
-      Parent->getOpcode() != X86ISD::OCAML_RAISE) {
+      Parent->getOpcode() != X86ISD::EH_OCAML_PUSHHANDLER &&
+      Parent->getOpcode() != X86ISD::EH_OCAML_POPHANDLER) {
     unsigned AddrSpace =
       cast<MemSDNode>(Parent)->getPointerInfo().getAddrSpace();
     if (AddrSpace == X86AS::GS)

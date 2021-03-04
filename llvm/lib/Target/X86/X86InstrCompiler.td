@@ -225,26 +225,18 @@ let hasSideEffects = 1, isBarrier = 1, isCodeGenOnly = 1,
                             "#EH_SJLJ_LONGJMP64",
                             [(X86eh_sjlj_longjmp addr:$buf)]>,
                           Requires<[In64BitMode]>;
-  }
-}
 
-let hasSideEffects = 1, isBarrier = 1, isCodeGenOnly = 1,
-    usesCustomInserter = 1 in {
-  def OCAML_SETJMP  : I<0, Pseudo, (outs GR64:$dst), (ins),
-                            "#OCAML_SETJMP",
-                            [(set GR64:$dst, (X86ocaml_setjmp))]>,
-                          Requires<[In64BitMode]>;
-  def OCAML_POPJMP : I<0, Pseudo, (outs), (ins),
-                            "#OCAML_POPJMP",
-                            [(X86ocaml_popjmp)]>,
-                          Requires<[In64BitMode]>;
+  def EH_OCaml_PushHandler : I<0, Pseudo, (outs), (ins i64mem:$buf),
+                            "#EH_OCAML_PUSHHANDLER",
+                            [(X86eh_ocaml_pushhandler addr:$buf)]>,
+				  Requires<[In64BitMode]>;
 
-  let isTerminator = 1 in {
-  def OCAML_RAISE : I<0, Pseudo, (outs), (ins i64mem:$buf),
-                            "#OCAML_RAISE",
-                            [(X86ocaml_raise addr:$buf)]>,
-                          Requires<[In64BitMode]>;
+  def EH_OCaml_PopHandler : I<0, Pseudo, (outs), (ins),
+                            "#EH_OCAML_POPHANDLER",
+                            [(X86eh_ocaml_pophandler)]>,
+				  Requires<[In64BitMode]>;
   }
+
 }
 
 let isBranch = 1, isTerminator = 1, isCodeGenOnly = 1 in {

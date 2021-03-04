@@ -143,6 +143,9 @@ enum NodeType {
   /// The target initializes the dispatch table here.
   EH_SJLJ_SETUP_DISPATCH,
 
+  EH_OCAML_PUSHHANDLER,
+  EH_OCAML_POPHANDLER,
+
   OCAML_SETJMP,
   OCAML_POPJMP,
   OCAML_RAISE,
