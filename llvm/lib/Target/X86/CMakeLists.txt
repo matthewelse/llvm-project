@@ -78,6 +78,7 @@ set(sources
   X86VZeroUpper.cpp
   X86WinAllocaExpander.cpp
   X86WinEHState.cpp
+  X86OCamlEH.cpp
   X86InsertWait.cpp
   )
 

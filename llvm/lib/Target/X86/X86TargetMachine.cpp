@@ -65,6 +65,7 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeX86Target() {
   initializeX86LowerAMXTypeLegacyPassPass(PR);
   initializeGlobalISel(PR);
   initializeWinEHStatePassPass(PR);
+  initializeX86OCamlEHPass(PR);
   initializeFixupBWInstPassPass(PR);
   initializeEvexToVexInstPassPass(PR);
   initializeFixupLEAPassPass(PR);
@@ -500,6 +501,9 @@ void X86PassConfig::addPreRegAlloc() {
   if (getOptLevel() != CodeGenOpt::None) {
     addPass(createX86PreTileConfigPass());
   }
+
+  // TODO: melse - this probably needs to live earlier in the chain.
+  addPass(createX86OCamlEHPass());
 }
 
 void X86PassConfig::addMachineSSAOptimization() {

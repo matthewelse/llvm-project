@@ -95,6 +95,10 @@ FunctionPass *createX86CallFrameOptimization();
 /// Windows-specific but architecture-neutral preparation.
 FunctionPass *createX86WinEHStatePass();
 
+/// FIXME: better notes
+/// Returns a machine IR pass that inserts EH stuff.
+FunctionPass *createX86OCamlEHPass();
+
 /// Return a Machine IR pass that expands X86-specific pseudo
 /// instructions into a sequence of actual instructions. This pass
 /// must run after prologue/epilogue insertion and before lowering
@@ -151,6 +155,7 @@ void initializeFixupBWInstPassPass(PassRegistry &);
 void initializeFixupLEAPassPass(PassRegistry &);
 void initializeFPSPass(PassRegistry &);
 void initializeWinEHStatePassPass(PassRegistry &);
+void initializeX86OCamlEHPass(PassRegistry &);
 void initializeX86AvoidSFBPassPass(PassRegistry &);
 void initializeX86AvoidTrailingCallPassPass(PassRegistry &);
 void initializeX86CallFrameOptimizationPass(PassRegistry &);
