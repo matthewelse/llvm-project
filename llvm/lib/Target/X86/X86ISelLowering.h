@@ -307,6 +307,7 @@ namespace llvm {
 
     EH_OCAML_PUSHHANDLER,
     EH_OCAML_POPHANDLER,
+    EH_OCAML_LANDINGPAD,
 
     /// Tail call return. See X86TargetLowering::LowerCall for
     /// the list of operands.
@@ -1524,6 +1525,7 @@ namespace llvm {
     SDValue lowerEH_SJLJ_SETUP_DISPATCH(SDValue Op, SelectionDAG &DAG) const;
     SDValue lowerEH_OCAML_PUSHHANDLER(SDValue Op, SelectionDAG &DAG) const;
     SDValue lowerEH_OCAML_POPHANDLER(SDValue Op, SelectionDAG &DAG) const;
+    SDValue lowerEH_OCAML_LANDINGPAD(SDValue Op, SelectionDAG &DAG) const;
     SDValue LowerINIT_TRAMPOLINE(SDValue Op, SelectionDAG &DAG) const;
     SDValue LowerFLT_ROUNDS_(SDValue Op, SelectionDAG &DAG) const;
     SDValue LowerWin64_i128OP(SDValue Op, SelectionDAG &DAG) const;
@@ -1624,6 +1626,9 @@ namespace llvm {
                                               MachineBasicBlock *MBB) const;
 
     MachineBasicBlock *emitEHOCamlPopHandler(MachineInstr &MI,
+                                             MachineBasicBlock *MBB) const;
+
+    MachineBasicBlock *emitEHOCamlLandingPad(MachineInstr &MI,
                                              MachineBasicBlock *MBB) const;
 
     MachineBasicBlock *emitEHSjLjSetJmp(MachineInstr &MI,

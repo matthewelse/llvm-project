@@ -461,12 +461,9 @@ X86TargetLowering::X86TargetLowering(const X86TargetMachine &TM,
   setOperationAction(ISD::EH_SJLJ_SETUP_DISPATCH, MVT::Other, Custom);
   setOperationAction(ISD::EH_OCAML_PUSHHANDLER, MVT::Other, Custom);
   setOperationAction(ISD::EH_OCAML_POPHANDLER, MVT::Other, Custom);
+  setOperationAction(ISD::EH_OCAML_LANDINGPAD, MVT::Other, Custom);
   if (TM.Options.ExceptionModel == ExceptionHandling::SjLj)
     setLibcallName(RTLIB::UNWIND_RESUME, "_Unwind_SjLj_Resume");
-
-  setOperationAction(ISD::OCAML_SETJMP, MVT::i64, Custom);
-  setOperationAction(ISD::OCAML_POPJMP, MVT::Other, Custom);
-  setOperationAction(ISD::OCAML_RAISE, MVT::Other, Custom);
 
   // Darwin ABI issue.
   for (auto VT : { MVT::i32, MVT::i64 }) {
@@ -26711,6 +26708,15 @@ SDValue X86TargetLowering::lowerEH_OCAML_POPHANDLER(SDValue Op,
 		  Op.getOperand(0));
 }
 
+SDValue X86TargetLowering::lowerEH_OCAML_LANDINGPAD(SDValue Op,
+                                               SelectionDAG &DAG) const {
+  SDLoc DL(Op);
+  outs() << "lowering ISD EH_OCAML_LANDINGPAD\n";
+
+  return DAG.getNode(X86ISD::EH_OCAML_LANDINGPAD, DL, MVT::Other,
+		  Op.getOperand(0));
+}
+
 SDValue X86TargetLowering::lowerEH_SJLJ_LONGJMP(SDValue Op,
                                                 SelectionDAG &DAG) const {
   SDLoc DL(Op);
@@ -31076,6 +31082,7 @@ const char *X86TargetLowering::getTargetNodeName(unsigned Opcode) const {
   NODE_NAME_CASE(EH_SJLJ_LONGJMP)
   NODE_NAME_CASE(EH_OCAML_PUSHHANDLER)
   NODE_NAME_CASE(EH_OCAML_POPHANDLER)
+  NODE_NAME_CASE(EH_OCAML_LANDINGPAD)
   NODE_NAME_CASE(EH_SJLJ_SETUP_DISPATCH)
   NODE_NAME_CASE(EH_RETURN)
   NODE_NAME_CASE(TC_RETURN)
@@ -33120,6 +33127,11 @@ X86TargetLowering::emitEHOCamlPopHandler(MachineInstr &MI, MachineBasicBlock *MB
 }
 
 MachineBasicBlock *
+X86TargetLowering::emitEHOCamlLandingPad(MachineInstr &MI, MachineBasicBlock *MBB) const {
+  assert(false && "I don't know what to do!");
+}
+
+MachineBasicBlock *
 X86TargetLowering::emitEHSjLjSetJmp(MachineInstr &MI,
                                     MachineBasicBlock *MBB) const {
   const DebugLoc &DL = MI.getDebugLoc();
@@ -34011,6 +34023,9 @@ X86TargetLowering::EmitInstrWithCustomInserter(MachineInstr &MI,
 
   case X86::EH_OCaml_PopHandler:
     return emitEHOCamlPopHandler(MI, BB);
+
+  case X86::EH_OCaml_LandingPad:
+    return emitEHOCamlLandingPad(MI, BB);
 
   case X86::Int_eh_sjlj_setup_dispatch:
     return EmitSjLjDispatchBlock(MI, BB);

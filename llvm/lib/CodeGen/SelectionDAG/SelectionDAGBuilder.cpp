@@ -6052,6 +6052,11 @@ void SelectionDAGBuilder::visitIntrinsicCall(const CallInst &I,
     DAG.setRoot(DAG.getNode(ISD::EH_OCAML_POPHANDLER, sdl, MVT::Other, getRoot()));
     return;
   }
+  case Intrinsic::ocaml_landingpad: {
+    outs() << "lowering intrinsic: ocaml landingpad\n";
+    DAG.setRoot(DAG.getNode(ISD::EH_OCAML_LANDINGPAD, sdl, MVT::Other, getRoot()));
+    return;
+  }
   // TODO: add an intrinsic for OCaml raise.
   case Intrinsic::masked_gather:
     visitMaskedGather(I);

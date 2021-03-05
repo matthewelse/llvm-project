@@ -226,6 +226,8 @@ let hasSideEffects = 1, isBarrier = 1, isCodeGenOnly = 1,
                             [(X86eh_sjlj_longjmp addr:$buf)]>,
                           Requires<[In64BitMode]>;
 
+    }
+
   def EH_OCaml_PushHandler : I<0, Pseudo, (outs), (ins i64mem:$buf),
                             "#EH_OCAML_PUSHHANDLER",
                             [(X86eh_ocaml_pushhandler addr:$buf)]>,
@@ -235,7 +237,12 @@ let hasSideEffects = 1, isBarrier = 1, isCodeGenOnly = 1,
                             "#EH_OCAML_POPHANDLER",
                             [(X86eh_ocaml_pophandler)]>,
 				  Requires<[In64BitMode]>;
-  }
+  def EH_OCaml_LandingPad : I<0, Pseudo, (outs GR64:$dst), (ins),
+                            "#EH_OCAML_LANDINGPAD",
+                            [(set GR64:$dst, (X86eh_ocaml_landingpad))]>,
+				  Requires<[In64BitMode]>;
+
+
 
 }
 

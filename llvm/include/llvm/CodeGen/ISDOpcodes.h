@@ -145,10 +145,8 @@ enum NodeType {
 
   EH_OCAML_PUSHHANDLER,
   EH_OCAML_POPHANDLER,
+  EH_OCAML_LANDINGPAD,
 
-  OCAML_SETJMP,
-  OCAML_POPJMP,
-  OCAML_RAISE,
 
   /// TargetConstant* - Like Constant*, but the DAG does not do any folding,
   /// simplification, or lowering of the constant. They are used for constants
