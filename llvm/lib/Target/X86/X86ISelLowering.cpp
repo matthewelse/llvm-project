@@ -26695,6 +26695,9 @@ SDValue X86TargetLowering::lowerEH_OCAML_PUSHHANDLER(SDValue Op,
   SDLoc DL(Op);
   outs() << "lowering ISD EH_OCAML_PUSHHANDLER\n";
 
+  MachineFrameInfo &MFI = DAG.getMachineFunction().getFrameInfo();
+  MFI.setHasCopyImplyingStackAdjustment(true);
+
   return DAG.getNode(X86ISD::EH_OCAML_PUSHHANDLER, DL, MVT::Other,
 		  Op.getOperand(0), Op.getOperand(1));
 }
@@ -26703,6 +26706,9 @@ SDValue X86TargetLowering::lowerEH_OCAML_POPHANDLER(SDValue Op,
                                                SelectionDAG &DAG) const {
   SDLoc DL(Op);
   outs() << "lowering ISD EH_OCAML_POPHANDLER\n";
+
+  MachineFrameInfo &MFI = DAG.getMachineFunction().getFrameInfo();
+  MFI.setHasCopyImplyingStackAdjustment(true);
 
   return DAG.getNode(X86ISD::EH_OCAML_POPHANDLER, DL, MVT::Other,
 		  Op.getOperand(0));
@@ -33117,18 +33123,83 @@ void X86TargetLowering::emitSetJmpShadowStackFix(MachineInstr &MI,
 }
 
 MachineBasicBlock *
-X86TargetLowering::emitEHOCamlPushHandler(MachineInstr &MI, MachineBasicBlock *MBB) const {
-  assert(false && "I don't know what to do!");
+X86TargetLowering::emitEHOCamlPushHandler(MachineInstr &MI,
+                                          MachineBasicBlock *MBB) const {
+  const DebugLoc &DL = MI.getDebugLoc();
+  MachineFunction *MF = MBB->getParent();
+  const TargetInstrInfo *TII = Subtarget.getInstrInfo();
+  const TargetRegisterInfo *TRI = Subtarget.getRegisterInfo();
+  MachineRegisterInfo &MRI = MF->getRegInfo();
+
+  const BasicBlock *BB = MBB->getBasicBlock();
+  MachineFunction::iterator I = ++MBB->getIterator();
+
+  // TODO: take the domain state exception pointer as an argument to the
+  // intrinsic, once we un-reserve r14 and r15.
+  // https://github.com/ocaml/ocaml/blob/trunk/runtime/caml/domain_state.tbl
+  const unsigned domain_state_exception_pointer = 16;
+
+  // TODO:
+  // push <first argument label>
+  // push (r14 + domain_state_exception_pointer)
+  // mov %rsp,(r14 + domain_state_exception_pointer)
+  //
+  // hopefully this doesn't break the frame offsets stuff?
+
+  assert(false && "OCAML PUSH: I don't know what to do!");
 }
 
 MachineBasicBlock *
-X86TargetLowering::emitEHOCamlPopHandler(MachineInstr &MI, MachineBasicBlock *MBB) const {
-  assert(false && "I don't know what to do!");
+X86TargetLowering::emitEHOCamlPopHandler(MachineInstr &MI,
+                                         MachineBasicBlock *MBB) const {
+  const DebugLoc &DL = MI.getDebugLoc();
+  MachineFunction *MF = MBB->getParent();
+  const TargetInstrInfo *TII = Subtarget.getInstrInfo();
+  const TargetRegisterInfo *TRI = Subtarget.getRegisterInfo();
+  MachineRegisterInfo &MRI = MF->getRegInfo();
+
+  const BasicBlock *BB = MBB->getBasicBlock();
+  MachineFunction::iterator I = ++MBB->getIterator();
+
+  // TODO: take the domain state exception pointer as an argument to the
+  // intrinsic, once we un-reserve r14 and r15.
+  // https://github.com/ocaml/ocaml/blob/trunk/runtime/caml/domain_state.tbl
+  const int64_t domain_state_exception_pointer = 16;
+
+  // TODO:
+  // pop (r14 + domain_state_exception_pointer)
+  // add $8, %rsp
+
+  Register RSP = X86::RSP;
+  Register R14 = X86::R14;
+  // Register PTR =
+  // MRI.createVirtualRegister(getPointerTy(DAG.getDataLayout()));
+
+  BuildMII(MBB, MI, DL, TII->get(X86::POP64rmm))
+    .addReg(R14)
+    .addImm(domain_state_exception_pointer);
+  
+  BuildMII(MBB, MI, DL, TII->get(X86::ADD64ri))
+    .addReg(R)
+
+  // auto MI_POP = BuildMI(*MBB, MI, DL, TII->get(X86::POP64rmm)).addMemOperand(
+  //       MachineMemOperand(
+  //         MachinePointerInfo.getGOT(MFF)
+  //         .getWithOffset()
+  //         MachinePointerInfo(R14, domain_state_exception_pointer)
+  //         )
+  //     );
+
+  assert(false && "OCaml POP: I don't know what to do!");
 }
 
 MachineBasicBlock *
-X86TargetLowering::emitEHOCamlLandingPad(MachineInstr &MI, MachineBasicBlock *MBB) const {
-  assert(false && "I don't know what to do!");
+X86TargetLowering::emitEHOCamlLandingPad(MachineInstr &MI,
+                                         MachineBasicBlock *MBB) const {
+  // TODO: fix liveness stuff, can we fix the CFG somehow?
+  // TODO: COPY $rax
+
+  assert(false && "OCaml LP: I don't know what to do!");
 }
 
 MachineBasicBlock *
