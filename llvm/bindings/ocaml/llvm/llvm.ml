@@ -675,8 +675,12 @@ external const_extractvalue : llvalue -> int array -> llvalue
                             = "llvm_const_extractvalue"
 external const_insertvalue : llvalue -> llvalue -> int array -> llvalue
                            = "llvm_const_insertvalue"
-external const_inline_asm : lltype -> string -> string -> bool -> bool ->
-                            llvalue
+external const_inline_asm : lltype
+                         -> assembly:string
+                         -> constraints:string
+                         -> has_side_effects:bool
+                         -> should_align_stack:bool
+                         -> llvalue
                           = "llvm_const_inline_asm"
 external block_address : llvalue -> llbasicblock -> llvalue = "LLVMBlockAddress"
 

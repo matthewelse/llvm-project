@@ -1310,7 +1310,12 @@ val const_insertvalue : llvalue -> llvalue -> int array -> llvalue
 
 (** [const_inline_asm ty asm con side align] inserts a inline assembly string.
     See the method [llvm::InlineAsm::get]. *)
-val const_inline_asm : lltype -> string -> string -> bool -> bool -> llvalue
+val const_inline_asm : lltype
+                    -> assembly:string
+                    -> constraints:string
+                    -> has_side_effects:bool
+                    -> should_align_stack:bool
+                    -> llvalue
 
 (** [block_address f bb] returns the address of the basic block [bb] in the
     function [f]. See the method [llvm::BasicBlock::get]. *)
@@ -2533,6 +2538,12 @@ val build_empty_phi : lltype -> string -> llbuilder -> llvalue
     instruction at the position specified by the instruction builder [b].
     See the method [llvm::LLVMBuilder::CreateCall]. *)
 val build_call : llvalue -> llvalue array -> string -> llbuilder -> llvalue
+
+(** [build_callbr fn default_fallthrough args targets name b] creates a
+    [%name = callbr %fn(args...) to label %default_fallthrough [label %target...]]
+    instruction at the position specified by the instruction builder [b].
+    See the method [llvm::LLVMBuilder::CreateCallBr] *)
+val build_callbr : llvalue -> llbasicblock -> llvalue array -> llbasicblock array -> string -> llbuilder -> llvalue
 
 (** [build_select cond thenv elsev name b] creates a
     [%name = select %cond, %thenv, %elsev]
