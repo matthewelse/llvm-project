@@ -3934,6 +3934,10 @@ LLVMValueRef LLVMBuildCall(LLVMBuilderRef, LLVMValueRef Fn,
 LLVMValueRef LLVMBuildCall2(LLVMBuilderRef, LLVMTypeRef, LLVMValueRef Fn,
                             LLVMValueRef *Args, unsigned NumArgs,
                             const char *Name);
+LLVMValueRef LLVMBuildCallBr(LLVMBuilderRef, LLVMValueRef Fn, LLVMBasicBlockRef DefaultDest,
+                             LLVMValueRef *Args, unsigned NumArgs,
+                             LLVMBasicBlockRef *IndirectDests, unsigned NumIndirectDests,
+                             const char* Name);
 LLVMValueRef LLVMBuildSelect(LLVMBuilderRef, LLVMValueRef If,
                              LLVMValueRef Then, LLVMValueRef Else,
                              const char *Name);

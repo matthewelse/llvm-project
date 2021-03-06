@@ -3890,6 +3890,22 @@ LLVMValueRef LLVMBuildCall(LLVMBuilderRef B, LLVMValueRef Fn,
                                     makeArrayRef(unwrap(Args), NumArgs), Name));
 }
 
+LLVMValueRef LLVMBuildCallBr(LLVMBuilderRef B, LLVMValueRef Fn,
+                             LLVMBasicBlockRef DefaultDest,
+                             LLVMValueRef *Args, unsigned NumArgs,
+                             LLVMBasicBlockRef *IndirectDests, unsigned NumIndirectDests,
+                             const char *Name) {
+  Value *V = unwrap(Fn);
+  FunctionType *FnT =
+      cast<FunctionType>(cast<PointerType>(V->getType())->getElementType());
+
+  return wrap(unwrap(B)->CreateCallBr(FnT, unwrap(Fn),
+                                      unwrap(DefaultDest),
+                                      makeArrayRef(unwrap(IndirectDests), NumIndirectDests),
+                                      makeArrayRef(unwrap(Args), NumArgs),
+                                      Name));
+}
+
 LLVMValueRef LLVMBuildCall2(LLVMBuilderRef B, LLVMTypeRef Ty, LLVMValueRef Fn,
                             LLVMValueRef *Args, unsigned NumArgs,
                             const char *Name) {

@@ -2389,6 +2389,23 @@ CAMLprim LLVMValueRef llvm_build_call(LLVMValueRef Fn, value Params,
                        Wosize_val(Params), String_val(Name));
 }
 
+/* llvalue -> llbasicblock -> llvalue array -> llbasicblock array -> string -> llbuilder -> llvalue */
+CAMLprim LLVMValueRef llvm_build_callbr_nat(LLVMValueRef Fn, LLVMBasicBlockRef DefaultDest, value Params, value IndirectDests, value Name, value B) {
+  return LLVMBuildCallBr(Builder_val(B), Fn, DefaultDest,
+                         (LLVMValueRef *) Op_val(Params), Wosize_val(Params), 
+                         (LLVMBasicBlockRef *) Op_val(IndirectDests), Wosize_val(IndirectDests),
+                         String_val(Name));
+}
+
+CAMLprim LLVMValueRef llvm_build_callbr_bc(value* Args, int NumArgss) {
+   return llvm_build_callbr_nat((LLVMValueRef) Args[0], 
+                                (LLVMBasicBlockRef) Args[1],
+                                Args[2],
+                                Args[3],
+                                Args[4],
+                                Args[5]);
+}
+
 /* llvalue -> llvalue -> llvalue -> string -> llbuilder -> llvalue */
 CAMLprim LLVMValueRef llvm_build_select(LLVMValueRef If,
                                         LLVMValueRef Then, LLVMValueRef Else,
