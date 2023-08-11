@@ -3444,6 +3444,8 @@ StringRef BuiltinType::getName(const PrintingPolicy &Policy) const {
     return "<ARC unbridged cast type>";
   case BuiltinFn:
     return "<builtin fn type>";
+  case OCamlValue:
+    return "ocaml_value";
   case ObjCId:
     return "id";
   case ObjCClass:
@@ -4832,6 +4834,7 @@ bool Type::canHaveNullability(bool ResultIfUnknown) const {
       return ResultIfUnknown;
 
     case BuiltinType::Void:
+    case BuiltinType::OCamlValue:
     case BuiltinType::ObjCId:
     case BuiltinType::ObjCClass:
     case BuiltinType::ObjCSel:

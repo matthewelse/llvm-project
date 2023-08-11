@@ -1460,6 +1460,8 @@ void ASTContext::InitBuiltinTypes(const TargetInfo &Target,
 
   ObjCSuperType = QualType();
 
+  InitBuiltinType(OCamlValueTy, BuiltinType::OCamlValue);
+
   // void * type
   if (LangOpts.OpenCLGenericAddressSpace) {
     auto Q = VoidTy.getQualifiers();
@@ -2042,6 +2044,10 @@ TypeInfo ASTContext::getTypeInfoImpl(const Type *T) const {
   case Type::Builtin:
     switch (cast<BuiltinType>(T)->getKind()) {
     default: llvm_unreachable("Unknown builtin type!");
+    case BuiltinType::OCamlValue:
+      Width = 64;
+      Align = 64;
+      break;
     case BuiltinType::Void:
       // GCC extension: alignof(void) = 8 bits.
       Width = 0;
@@ -8690,6 +8696,9 @@ static char getObjCEncodingForPrimitiveType(const ASTContext *C,
         Diags.Report(DiagID) << BT->getName(C->getPrintingPolicy());
         return ' ';
       }
+
+    case BuiltinType::OCamlValue:
+      llvm_unreachable("@encoding OCaml value type");
 
     case BuiltinType::ObjCId:
     case BuiltinType::ObjCClass:
