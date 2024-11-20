@@ -5066,6 +5066,15 @@ lldb::Encoding TypeSystemClang::GetEncoding(lldb::opaque_compiler_type_t type,
     case clang::BuiltinType::IncompleteMatrixIdx:
       break;
 
+    case clang::BuiltinType::UnresolvedTemplate:
+      break;
+
+    // AMD GPU builtin types.
+#define AMDGPU_TYPE(Name, Id, SingletonId, Width, Align)                       \
+  case clang::BuiltinType::Id:
+#include "clang/Basic/AMDGPUTypes.def"
+      break;
+
     case clang::BuiltinType::OCamlValue:
       return lldb::eEncodingSint;
     }
@@ -8765,7 +8774,7 @@ bool TypeSystemClang::DumpTypeValue(
     clang::QualType qual_type(GetQualType(type));
 
     if (qual_type == getASTContext ().OCamlValueTy) {
-      return DumpDataExtractor(data, s, byte_offset, eFormatOCamlValue, 8, 1,
+      return DumpDataExtractor(data, &s, byte_offset, eFormatOCamlValue, 8, 1,
                                UINT32_MAX, LLDB_INVALID_ADDRESS,
                                0, 0, exe_scope);
     }
